@@ -1,11 +1,13 @@
 /*
-	Событие stimulus-collapse-toggle:
+	Основное событие: stimulus-collapse-toggle
     
     {
     	detail: {
         	status: true
         }
     }
+    
+    Побочные события: stimulus-collapse-status-true, stimulus-collapse-status-false
 */
 class CollapseController extends Stimulus.Controller {
 	static targets = ['content', 'wrapper']
@@ -61,12 +63,7 @@ class CollapseController extends Stimulus.Controller {
         
     	this.waitTransition = true
         const status = this.statusValue
-        
-        this.element.dispatchEvent(new CustomEvent('stimulus-collapse-toggle', {
-        	detail: {
-            	status: status
-            }
-        }))
+        this.dispatchEvent(status)
         
         if (!status) {
         	this.wrapperTarget.style.height = this.contentTarget.scrollHeight+'px'
@@ -94,6 +91,20 @@ class CollapseController extends Stimulus.Controller {
         
             setTimeout(() => {this.statusValueChanged()}, 100)
         }, (this.hasTransitionValue ? this.transitionValue : 0.35)*1000)
+    }
+    
+    dispatchEvent(status) {
+        this.element.dispatchEvent(new CustomEvent('stimulus-collapse-toggle', {
+        	detail: {
+            	status: status
+            }
+        }))
+        
+        if (status) {
+            this.element.dispatchEvent(new CustomEvent('stimulus-collapse-status-true'))
+        } else {
+            this.element.dispatchEvent(new CustomEvent('stimulus-collapse-status-false'))        
+        }
     }
     
     toggle() {
